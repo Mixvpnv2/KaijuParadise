@@ -1,0 +1,1618 @@
+local Decimals = 4
+local Clock = os.clock()
+local ValueText = "Value Is Now :"
+
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Mixvpnv2/NewLib/refs/heads/main/Lib"))({
+    cheatname = "EtherealV2", -- watermark text
+    gamename = "projectdelta", -- watermark text
+})
+
+library:init()
+
+local Window1  = library.NewWindow({
+    title = "Main | Hello", -- Mainwindow Text
+    size = UDim2.new(0, 510, 0.6, 6
+)})
+
+local Tab1 = Window1:AddTab("  Combat  ")
+local SettingsTab = library:CreateSettingsTab(Window1)
+
+local Tab3 = Window1:AddTab("  Misc  ")
+
+local Tab4 = Window1:AddTab("  Visuals  ")
+
+local Section2 = Tab4:AddSection("World lol", 2)
+
+Section2:AddToggle({
+    text = "OFF Shadows",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Lighting").GlobalShadows = false
+    else
+        game:GetService("Lighting").GlobalShadows = true
+    end
+end
+})  
+Section2:AddToggle({
+    text = "No Bloom",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Lighting").Bloom.Enabled = false
+    else
+        game:GetService("Lighting").Bloom.Enabled = true
+    end
+end
+})
+Section2:AddToggle({
+    text = "No SunRays",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Lighting").SunRays.Enabled = false
+    else
+        game:GetService("Lighting").SunRays.Enabled = true
+    end
+end
+})
+Section2:AddToggle({
+    text = "No WaterBlur",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Lighting").WaterBlur.Size = 0
+    else
+        game:GetService("Lighting").WaterBlur.Size = 24
+    end
+end
+})
+Section2:AddToggle({
+    text = "No Clouds",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        workspace.Terrain.Clouds.Enabled = false
+    else
+        workspace.Terrain.Clouds.Enabled = true
+    end
+end
+})
+Section2:AddToggle({
+    text = "Fullbright Moderation",
+    state = false,
+    risky = true,
+    flag = "enable skins",  
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Lighting").Fullbright.Enabled = true
+    else
+        game:GetService("Lighting").Fullbright.Enabled = false
+    end
+end
+}) 
+Section2:AddToggle({
+    text = "Remove (Foliage)",
+    state = false,
+    risky = true,
+    flag = "Foliage",
+    risky = false,
+    callback = function(Value)
+        if Value then
+            while Value do task.wait(5)
+                if not workspace:FindFirstChild("SpawnerZones") or not workspace.SpawnerZones:FindFirstChild("Foliage") then return end
+                if Value == false then continue end
+                for i,v in ipairs(workspace.SpawnerZones.Foliage:GetChildren()) do
+                    for _,f in ipairs(v:GetChildren()) do
+                        for _,s in ipairs(f:GetChildren()) do
+                            if s:IsA("MeshPart") and s.Transparency == 0 then
+                                if s.Color == Color3.fromRGB(163, 162, 165) then
+                                    s.Transparency = 1
+                                end
+                            end 
+                        end
+                    end
+                end
+            end
+        elseif not Value then
+            if not workspace:FindFirstChild("SpawnerZones") or not workspace.SpawnerZones:FindFirstChild("Foliage") then return end
+            for i,v in ipairs(workspace.SpawnerZones.Foliage:GetChildren()) do
+                for _,f in ipairs(v:GetChildren()) do
+                    for _,s in ipairs(f:GetChildren()) do
+                        if s:IsA("MeshPart") then
+                            if s.Color == Color3.fromRGB(163, 162, 165) and s.Transparency == 1 then
+                                s.Transparency = 0
+                            end
+                        end 
+                    end
+                end
+            end
+        end
+    end
+})
+Section2:AddToggle({
+    text = "Remove (grass)",
+    state = false,
+    risky = true,
+    flag = "Toggle_1",
+    risky = false,
+    callback = function(Value)
+        sethiddenproperty(Workspace.Terrain, "Decoration", not Value)
+    end
+})
+
+local Lighting = game:GetService("Lighting")
+
+-- Conversion functions between Roblox's 0-1 and standard 0-255 ranges
+local function to255(color)
+    return Color3.fromRGB(
+        math.floor(color.R * 255 + 0.5),
+        math.floor(color.G * 255 + 0.5),
+        math.floor(color.B * 255 + 0.5)
+    )
+end
+
+local function clampColor(color)
+    return Color3.new(
+        math.clamp(color.R, 0, 1),
+        math.clamp(color.G, 0, 1),
+        math.clamp(color.B, 0, 1)
+    )
+end
+
+local OriginalAmbient = Lighting.Ambient
+
+-- Ambient Color Picker
+Section2:AddColor({
+    text = "Ambient",
+    color = to255(OriginalAmbient),
+    flag = "AmbientColor",
+    risky = false,
+    callback = function(newColor)
+        Lighting.Ambient = clampColor(newColor)
+    end
+})
+
+local Section1 = Tab1:AddSection("Section 1", 1)
+
+local Players = game:GetService("Players")
+local localplayer = Players.LocalPlayer
+
+Section1:AddToggle({
+    text = "Toggle Bhop",
+    state = false,
+    risky = true,
+    tooltip = "Bunny Hop Automation",
+    flag = "Toggle_1",
+    callback = function(v)
+        if v then
+            spawn(function()
+                -- Loop only runs when toggle is active
+                while library.flags.Toggle_1 do
+                    -- Check if character exists and has a Humanoid
+                    if localplayer.Character then
+                        local Humanoid = localplayer.Character:FindFirstChildOfClass("Humanoid")
+                        if Humanoid then
+                            Humanoid:SetAttribute("JumpCooldown", 0) -- Remove jump delay
+                        end
+                    end
+                    task.wait(0.01) -- Prevents crashing
+                end
+            end)
+        end
+    end
+})
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- WaterWalk System
+local WaterWalkFolder = workspace:FindFirstChild("WaterWalk") or Instance.new("Folder", workspace)
+WaterWalkFolder.Name = "WaterWalk"
+
+local function createWaterPlatform(position)
+    local platform = Instance.new("Part")
+    platform.Size = Vector3.new(60, 1, 60)
+    platform.Anchored = true
+    platform.CanQuery = false
+    platform.CanTouch = false
+    platform.Material = Enum.Material.Metal
+    platform.Position = position
+    platform.Parent = WaterWalkFolder
+    platform.Transparency = 1
+    return platform
+end
+
+local function cleanWaterWalk()
+    for _, v in pairs(WaterWalkFolder:GetChildren()) do
+        if v:IsA("Part") then
+            v:Destroy()
+        end
+    end
+end
+
+local function waterWalkEnabled(enable)
+    if enable then
+        local rayparams = RaycastParams.new()
+        rayparams.FilterType = Enum.RaycastFilterType.Exclude
+        
+        local characterConnection
+        local heartbeatConnection
+        
+        local function setupCharacter()
+            local character = localPlayer.Character
+            if not character then
+                character = localPlayer.CharacterAdded:Wait()
+            end
+            return character
+        end
+
+        characterConnection = localPlayer.CharacterAdded:Connect(function()
+            setupCharacter()
+        end)
+
+        heartbeatConnection = RunService.Heartbeat:Connect(function()
+            local character = setupCharacter()
+            if not character then return end
+            
+            local head = character:FindFirstChild("Head")
+            if not head then return end
+
+            -- Update filter list
+            rayparams.FilterDescendantsInstances = {character}
+            
+            -- Check for ViewModel
+            local viewModel = camera:FindFirstChild("ViewModel")
+            if viewModel then
+                table.insert(rayparams.FilterDescendantsInstances, viewModel)
+            end
+
+            -- Calculate ray parameters
+            local rayOrigin = head.Position 
+                + Vector3.new(0, 150, 0) 
+                + camera.CFrame.LookVector * 5
+                
+            local rayDirection = Vector3.new(0, -300, 0)
+
+            -- Perform raycast
+            local rayResult = workspace:Raycast(rayOrigin, rayDirection, rayparams)
+            
+            if rayResult and rayResult.Material == Enum.Material.Water then
+                createWaterPlatform(rayResult.Position)
+            end
+        end)
+
+        return function()
+            characterConnection:Disconnect()
+            heartbeatConnection:Disconnect()
+            cleanWaterWalk()
+        end
+    else
+        cleanWaterWalk()
+    end
+end
+
+-- Fixed Toggle Section
+Section1:AddToggle({
+    text = "Water Walk",
+    state = false,
+    risky = false,
+    tooltip = "Walk on water surfaces",
+    flag = "WaterWalkToggle",
+    callback = function(v)
+        -- Use pcall for error handling
+        local success, err = pcall(function()
+            -- Cleanup previous connections
+            if waterWalkCleanup then
+                waterWalkCleanup()
+                waterWalkCleanup = nil
+            end
+            
+            if v then
+                waterWalkCleanup = waterWalkEnabled(true)
+            else
+                waterWalkEnabled(false)
+            end
+        end)
+        
+        if not success then
+            warn("WaterWalk Error:", err)
+        end
+    end
+})
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
+local playerAddedConnection = nil
+
+-- Create a test button container
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ModDetectorUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local testButton = Instance.new("TextButton")
+testButton.Text = "TEST MODERATOR DETECTION"
+testButton.Size = UDim2.new(0, 200, 0, 40)
+testButton.Position = UDim2.new(0.5, -100, 0.9, 0)
+testButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+testButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+testButton.Font = Enum.Font.GothamBold
+testButton.Parent = screenGui
+
+-- Notification function with improved appearance
+local function notifyModerator(player)
+    StarterGui:SetCore("SendNotification", {
+        Title = "🚨 MODERATOR DETECTED",
+        Text = player.Name .. " is a moderator",
+        Duration = 8,
+        Icon = "rbxassetid://13347797518" -- Warning icon
+    })
+    
+    -- Create a visual indicator in the world
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ModeratorHighlight"
+        highlight.FillColor = Color3.fromRGB(255, 50, 50)
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.Parent = player.Character
+        
+        -- Make the highlight pulse
+        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+        local tween = TweenService:Create(highlight, tweenInfo, {FillTransparency = 0.5})
+        tween:Play()
+        
+        -- Remove after 15 seconds
+        task.delay(15, function()
+            if highlight then
+                highlight:Destroy()
+            end
+        end)
+    end
+end
+
+-- Monitor new players for moderator status
+local function monitorPlayer(player)
+    -- Check for attribute immediately
+    if player:GetAttribute("InvisibleMode") then
+        notifyModerator(player)
+        return
+    end
+    
+    -- Set up attribute listener
+    local conn
+    conn = player:GetAttributeChangedSignal("InvisibleMode"):Connect(function()
+        if player:GetAttribute("InvisibleMode") then
+            if conn and conn.Connected then
+                conn:Disconnect()
+            end
+            notifyModerator(player)
+        end
+    end)
+    
+    -- Cleanup after 10 seconds
+    task.delay(10, function()
+        if conn and conn.Connected then
+            conn:Disconnect()
+        end
+    end)
+end
+
+-- Function to properly simulate a moderator
+local function simulateModerator()
+    local localPlayer = game.Players.LocalPlayer
+    
+    -- This will trigger the detection system
+    localPlayer:SetAttribute("InvisibleMode", true)
+    
+    -- Visual feedback for the test
+    testButton.Text = "TESTING..."
+    testButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    
+    task.wait(2)
+    
+    testButton.Text = "TEST MODERATOR DETECTION"
+    testButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    
+    -- Clear attribute after test
+    task.delay(5, function()
+        localPlayer:SetAttribute("InvisibleMode", nil)
+    end)
+end
+
+-- Connect the test button
+testButton.MouseButton1Click:Connect(simulateModerator)
+
+-- Toggle implementation
+Section1:AddToggle({
+    text = "Moderator Detector",
+    state = false,
+    risky = false,
+    tooltip = "Alerts when server moderators join",
+    flag = "ModDetectorToggle",
+    callback = function(enabled)
+        if enabled then
+            -- Connect to new players
+            playerAddedConnection = Players.PlayerAdded:Connect(monitorPlayer)
+            
+            -- Check existing players
+            for _, player in ipairs(Players:GetPlayers()) do
+                task.spawn(monitorPlayer, player)
+            end
+            
+            testButton.Visible = true
+        else
+            -- Disconnect when disabled
+            if playerAddedConnection then
+                playerAddedConnection:Disconnect()
+                playerAddedConnection = nil
+            end
+            
+            testButton.Visible = false
+        end
+    end
+})
+
+-- Hide test button initially
+testButton.Visible = false
+
+print("Moderator Detector initialized. Enable the toggle to begin detection.")
+Section1:AddToggle({
+    text = "UAC disable",
+    state = false,
+    risky = true,
+    tooltip = "UAC off!",
+    flag = "Toggle_1",
+    risky = true,
+    callback = function(state)
+    if state then
+        game:GetService("ReplicatedStorage").Remotes.UAC.Archivable = false
+        print("off")
+    else
+        game:GetService("ReplicatedStorage").Remotes.UAC.Archivable = true
+        print("on")
+end
+end
+})
+Section1:AddToggle({
+    text = "Off ScreenEffects",
+    state = false,
+    risky = true,
+    tooltip = "Off ScreenEffects",
+    flag = "Toggle_1",
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Players").LocalPlayer.PlayerGui.MainGui.MainFrame.ScreenEffects.Visible = false
+    else
+        game:GetService("Players").LocalPlayer.PlayerGui.MainGui.MainFrame.ScreenEffects.Visible = true
+    end
+end
+})
+Section1:AddToggle({
+    text = "Hide server",
+    state = false,
+    risky = true,
+    tooltip = "Hide",
+    flag = "Toggle_1",
+    risky = false,
+    callback = function(state)
+    if state then
+        game:GetService("Players").LocalPlayer.PlayerGui.ServerInfo.Frame.serverInfo.Visible = false
+    else
+        game:GetService("Players").LocalPlayer.PlayerGui.ServerInfo.Frame.serverInfo.Visible = true
+    end
+end
+})
+Section1:AddToggle({
+    text = "lay (ANIM)",
+    state = false,
+    risky = true,
+    tooltip = "PlatformStand (ONLY REMOVE ANIM)",
+    flag = "",  
+    risky = false,
+    callback = function(state)
+local player = game.Players.LocalPlayer.Character.Humanoid
+    if state then
+        player.PlatformStand = true
+        print("use Remove ANIM")
+    else
+        player.PlatformStand = false
+    end
+end
+})
+local Section1 = Tab4:AddSection("Crosshair", 1)
+-- Crosshair System
+local function API_Check()
+    return Drawing ~= nil and "Yes" or "No"
+end
+
+if API_Check() == "No" then
+    game:GetService("StarterGui"):SetCore("SendNotification",{
+        Title = "Error",
+        Text = "Crosshair not supported on this exploit",
+        Duration = math.huge,
+        Button1 = "OK"
+    })
+    return
+end
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+-- Crosshair configuration
+local crosshairConfig = {
+    Visible = false,
+    Size = 20,
+    Thickness = 1,
+    Color = Color3.fromRGB(0, 255, 0),
+    Transparency = 1,
+    Gap = 5,  -- Added gap configuration
+    ToMouse = false
+}
+
+-- Crosshair objects
+local HorizontalLineLeft = Drawing.new("Line")
+local HorizontalLineRight = Drawing.new("Line")
+local VerticalLineTop = Drawing.new("Line")
+local VerticalLineBottom = Drawing.new("Line")
+
+local function UpdateCrosshair()
+    local Center = Camera.ViewportSize / 2
+    local Real_Size = crosshairConfig.Size / 2
+    local Gap = crosshairConfig.Gap / 2
+
+    -- Update common properties
+    for _, line in pairs({HorizontalLineLeft, HorizontalLineRight, VerticalLineTop, VerticalLineBottom}) do
+        line.Visible = crosshairConfig.Visible
+        line.Thickness = crosshairConfig.Thickness
+        line.Color = crosshairConfig.Color
+        line.Transparency = crosshairConfig.Transparency
+    end
+
+    if crosshairConfig.ToMouse then
+        local MousePos = UserInputService:GetMouseLocation()
+        -- Horizontal lines
+        HorizontalLineLeft.From = Vector2.new(MousePos.X - Real_Size, MousePos.Y)
+        HorizontalLineLeft.To = Vector2.new(MousePos.X - Gap, MousePos.Y)
+        HorizontalLineRight.From = Vector2.new(MousePos.X + Gap, MousePos.Y)
+        HorizontalLineRight.To = Vector2.new(MousePos.X + Real_Size, MousePos.Y)
+        
+        -- Vertical lines
+        VerticalLineTop.From = Vector2.new(MousePos.X, MousePos.Y - Real_Size)
+        VerticalLineTop.To = Vector2.new(MousePos.X, MousePos.Y - Gap)
+        VerticalLineBottom.From = Vector2.new(MousePos.X, MousePos.Y + Gap)
+        VerticalLineBottom.To = Vector2.new(MousePos.X, MousePos.Y + Real_Size)
+    else
+        -- Horizontal lines
+        HorizontalLineLeft.From = Vector2.new(Center.X - Real_Size, Center.Y)
+        HorizontalLineLeft.To = Vector2.new(Center.X - Gap, Center.Y)
+        HorizontalLineRight.From = Vector2.new(Center.X + Gap, Center.Y)
+        HorizontalLineRight.To = Vector2.new(Center.X + Real_Size, Center.Y)
+        
+        -- Vertical lines
+        VerticalLineTop.From = Vector2.new(Center.X, Center.Y - Real_Size)
+        VerticalLineTop.To = Vector2.new(Center.X, Center.Y - Gap)
+        VerticalLineBottom.From = Vector2.new(Center.X, Center.Y + Gap)
+        VerticalLineBottom.To = Vector2.new(Center.X, Center.Y + Real_Size)
+    end
+end
+
+-- Crosshair update loop
+RunService.Heartbeat:Connect(function()
+    if UserInputService:GetFocusedTextBox() then
+        crosshairConfig.Visible = false
+    end
+    UpdateCrosshair()
+end)
+
+-- UI Controls
+Section1:AddToggle({
+    text = "Crosshair",
+    state = false,
+    risky = false,
+    tooltip = "Toggle crosshair visibility",
+    flag = "CrosshairToggle",
+    callback = function(v)
+        crosshairConfig.Visible = v
+    end
+})
+
+Section1:AddSlider({
+    text = "Thickness",
+    tooltip = "Adjust crosshair thickness",
+    flag = "CrosshairThickness",
+    min = 1,
+    max = 10,
+    value = 1,
+    callback = function(v)
+        crosshairConfig.Thickness = v
+    end
+})
+
+Section1:AddSlider({
+    text = "Size",
+    tooltip = "Adjust crosshair size",
+    flag = "CrosshairSize",
+    min = 10,
+    max = 50,
+    value = 20,
+    callback = function(v)
+        crosshairConfig.Size = v
+    end
+})
+
+Section1:AddSlider({
+    text = "Gap",
+    tooltip = "Adjust crosshair gap",
+    flag = "CrosshairGap",
+    min = 0,
+    max = 50,
+    increment = 1,
+    value = 5,
+    callback = function(v)
+        crosshairConfig.Gap = v
+    end
+})
+
+Section1:AddSlider({
+    text = "Transparency",
+    tooltip = "Adjust crosshair transparency",
+    flag = "CrosshairTransparency",
+    min = 0,
+    max = 1,
+    increment = 0.1,
+    value = 1,
+    callback = function(v)
+        crosshairConfig.Transparency = v
+    end
+})
+
+Section1:AddColor({
+    text = "Color",
+    tooltip = "Change crosshair color",
+    flag = "CrosshairColor",
+    color = Color3.fromRGB(0, 255, 0),
+    callback = function(v)
+        crosshairConfig.Color = v
+    end
+})
+
+local Section1 = Tab3:AddSection("Tpwalk/Fov", 1)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Configuration values storage
+local values = {
+    enabled = {tpWalk = false},
+    misc = {tpWalkSpeed = 1}
+}
+
+-- Toggle TP Walk
+Section1:AddToggle({
+    text = "Toggle TP Walk",
+    state = false,
+    risky = true,
+    tooltip = "Teleportation movement",
+    flag = "Toggle_1",
+    callback = function(v)
+        values.enabled.tpWalk = v
+        if v then
+            -- Create movement loop when enabled
+            local connection
+            connection = RunService.Heartbeat:Connect(function(delta)
+                if not values.enabled.tpWalk then
+                    connection:Disconnect()
+                    return
+                end
+                
+                local character = LocalPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+                    if humanoid and humanoid.MoveDirection.Magnitude > 0 then
+                        character:TranslateBy(humanoid.MoveDirection * values.misc.tpWalkSpeed * delta * 10)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+-- TP Walk Speed Slider
+Section1:AddSlider({
+    text = "TP Walk Speed",
+    tooltip = "Adjust teleportation speed",
+    flag = "Slider_1",
+    min = 0.1,
+    max = 10,
+    increment = 0.1,
+    value = 1,
+    callback = function(v)
+        values.misc.tpWalkSpeed = v
+    end
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+
+-- FOV Control System
+local fovConnections = {}
+local currentFOV = 90
+
+local function updateFOV()
+    if ReplicatedStorage.Players:FindFirstChild(localPlayer.Name) then
+        local settings = ReplicatedStorage.Players[localPlayer.Name].Settings
+        if settings and settings.GameplaySettings then
+            settings.GameplaySettings:SetAttribute("DefaultFOV", currentFOV)
+        end
+    end
+end
+
+local function manageFOVUpdates(enable)
+    -- Cleanup existing connections
+    for _, connection in pairs(fovConnections) do
+        connection:Disconnect()
+    end
+    fovConnections = {}
+
+    if enable then
+        -- Persistent update system
+        fovConnections.heartbeat = RunService.H     eartbeat:Connect(function()
+            updateFOV()
+        end)
+        
+        -- Handle character respawns
+        fovConnections.characterAdded = localPlayer.CharacterAdded:Connect(function()
+            updateFOV()
+        end)
+        
+        -- Initial update
+        updateFOV()
+    else
+        -- Reset to default FOV
+        currentFOV = 90
+        updateFOV()
+    end
+end
+
+-- Toggle
+Section1:AddToggle({
+    text = "Toggle FOV",
+    flag = "FOV_Toggle",
+    callback = function(v)
+        manageFOVUpdates(v)
+    end
+})
+
+-- FOV Slider
+Section1:AddSlider({
+    text = "FOV Value",
+    flag = "FOV_Value",
+    suffix = "°",
+    min = 0,
+    max = 120,
+    increment = 0.1,
+    default = 90,
+    callback = function(v)
+        currentFOV = v
+        if library.flags.FOV_Toggle then
+            updateFOV()
+        end
+    end
+})
+
+Section1:AddButton({
+    enabled = true,
+    text = "(:",
+    tooltip = "NO",
+    confirm = true,
+    risky = false,
+    callback = function()
+getgenv().Config = {
+    Headless = true,
+
+    FakeDisplayName = "c00lkidd",
+    FakeName = "c00lkidd",
+    FakeId = 7913920482, -- input id
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Mixvpnv2/Name-Hider/refs/heads/main/Name-Hider"))()
+    end
+})
+Section1:AddButton({
+    enabled = true,
+    text = "load swimhub",
+    tooltip = "tooltip1",
+    confirm = true,
+    risky = false,
+    callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/SWIMHUBISWIMMING/swimhub/refs/heads/main/free/project_delta.lua"))()
+    end
+})
+local Section2 = Tab1:AddSection("Section 1", 2)
+
+Section2:AddSeparator({
+    enabled = true,
+    text = "Client Modifications"
+})
+
+Section2:AddSlider({
+    enabled = true,
+    text = "MaxSlopeAngle",
+    tooltip = "MaxSlopeAngle",
+    flag = "Slider_1",
+    suffix = "",
+    dragging = true,
+    focused = false,
+    min = 0,
+    max = 90,
+    increment = 0.1,
+    risky = false,
+    callback = function(v)
+local player = game.Players.LocalPlayer.Character.Humanoid
+
+player.MaxSlopeAngle = v
+end
+})
+Section2:AddSlider({
+    enabled = true,
+    text = "Health (Only local)",
+    tooltip = "Health",
+    flag = "Slider_1",
+    suffix = "",
+    dragging = true,
+    focused = false,
+    min = 1,
+    max = 100,
+    increment = 0.1,
+    risky = false,
+    callback = function(v)
+local player = game.Players.LocalPlayer.Character.Humanoid
+
+player.Health = v
+end
+})
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+local TimerConnection
+local currentSpeed = 1.0
+local localPlayer = players.LocalPlayer
+
+Section1:AddToggle({
+    text = "Time",
+    state = false,
+    risky = true,
+    tooltip = "Changes the game speed for your character",
+    flag = "TimerToggle",
+    callback = function(enabled)
+        if enabled then
+            -- Enable physics flags
+            setfflag('SimEnableStepPhysics', 'True')
+            setfflag('SimEnableStepPhysicsSelective', 'True')
+            
+            -- Create physics stepping connection
+            TimerConnection = runService.RenderStepped:Connect(function(dt)
+                local character = localPlayer.Character
+                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+                
+                if currentSpeed > 1 and rootPart then
+                    runService:Pause()
+                    workspace:StepPhysics(dt * (currentSpeed - 1), {rootPart})
+                    runService:Run()
+                end
+            end)
+        else
+            -- Clean up connection when disabled
+            if TimerConnection then
+                TimerConnection:Disconnect()
+                TimerConnection = nil
+            end
+        end
+    end
+})
+
+Section2:AddSlider({
+    text = "Time Speed",
+    tooltip = "Speed multiplier (1.0 to 3.0)",
+    flag = "TimerSlider",
+    suffix = "x",
+    min = 10,  -- Represents 1.0
+    max = 60,  -- Represents 3.0
+    increment = 0.1,
+    default = 10,  -- Default to 1.0
+    callback = function(value)
+        currentSpeed = value / 10  -- Convert to 1.0-3.0 range
+    end
+})
+-- Configuration section
+local ArmEnabled = false
+local ArmColor = Color3.new(0.458824, 0.466667, 1.000000)
+local ArmMaterial = Enum.Material.ForceField  -- Material storage
+
+local function ModifyParts(obj)
+    for _, part in ipairs(obj:GetDescendants()) do
+        if part:IsA("\66\97\115\101\80\97\114\116") then -- BasePart
+            part.Material = ArmMaterial  -- Use selected material
+            part.Color = ArmColor
+        end
+    end
+end
+
+local function RemoveSurfaces(obj)
+    for _, surface in ipairs(obj:GetDescendants()) do
+        if surface:IsA("\83\117\114\102\97\99\101\65\112\112\101\97\114\97\110\99\101") then -- SurfaceAppearance
+            surface:Destroy()
+        end
+    end
+end
+
+-- Arm modification loop
+task.spawn(function()
+    while true do
+        if ArmEnabled then
+            local cameraObj = game.Workspace:FindFirstChild("\67\97\109\101\114\97") -- Camera
+            local viewModel = cameraObj and cameraObj:FindFirstChild("\86\105\101\119\77\111\100\101\108") -- ViewModel
+            local weaponItem = viewModel and viewModel:FindFirstChild("\73\116\101\109") -- Item
+
+            if cameraObj then ModifyParts(cameraObj) end
+            if weaponItem then
+                ModifyParts(weaponItem)
+                RemoveSurfaces(weaponItem)
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- UI Components
+Section1:AddToggle({
+    text = "Gun Modifications",
+    state = false,
+    tooltip = "Toggle arm visual modifications",
+    callback = function(state)
+        ArmEnabled = state
+        print("Arm modifications:", state and "ENABLED" or "DISABLED")
+    end
+})
+
+Section1:AddColor({
+    text = "Gun Color",
+    tooltip = "Change arm material color",
+    color = Color3.new(0.458824, 0.466667, 1),
+    callback = function(newColor)
+        ArmColor = newColor
+    end
+})
+
+Section1:AddList({
+    text = "Gun Material", 
+    tooltip = "Select material type for Gun",
+    selected = "ForceField",
+    values = {"ForceField", "Neon", "Glass"},
+    callback = function(selection)
+        -- Convert selection to Enum.Material
+        GunMaterial = Enum.Material[selection]
+        print("Material changed to:", selection)
+    end
+})
+
+--Section2 :SetText("Text")
+
+Section1:AddButton({
+    enabled = true,
+    text = "OUCH",
+    tooltip = "!",
+    confirm = true,
+    risky = false,
+    callback = function()
+game:GetService("ReplicatedStorage").SFX.Hits.HitReactions.HitReaction1.SoundId = "rbxassetid://82520834438491"
+game:GetService("ReplicatedStorage").SFX.Hits.HitReactions.HitReaction2.SoundId = "rbxassetid://82520834438491" 
+game:GetService("ReplicatedStorage").SFX.Hits.HitReactions.HitReaction2.PlaybackSpeed = 1.3
+    end
+})
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Define hit sounds
+local hitSounds = {
+    AHAHA = "rbxassetid://134465374070275",
+    ["aha oh well"] = "rbxassetid://85476550721789"
+}
+
+-- Function to safely modify sounds
+local function modifyHitSounds(callback)
+    local sfxFolder = ReplicatedStorage:FindFirstChild("SFX")
+    if not sfxFolder then return end
+    
+    local hitsFolder = sfxFolder:FindFirstChild("Hits")
+    if not hitsFolder then return end
+    
+    -- Modify hit markers
+    local hitMarkers = hitsFolder:FindFirstChild("HitMarkers")
+    if hitMarkers then
+        local helmet = hitMarkers:FindFirstChild("Helmet")
+        local headshot = hitMarkers:FindFirstChild("Headshot")
+        
+        if helmet then callback(helmet) end
+        if headshot then callback(headshot) end
+    end
+    
+    -- Modify projectile hits
+    local projectileHits = hitsFolder:FindFirstChild("ProjectileHits")
+    if projectileHits then
+        local blood = projectileHits:FindFirstChild("Blood")
+        if blood then
+            local hitSound = blood:FindFirstChild("Hit")
+            if hitSound then callback(hitSound) end
+        end
+    end
+end
+
+-- Create dropdown for hit sounds
+Section1:AddList({
+    enabled = true,
+    text = "Sound",
+    tooltip = "Select hit marker sound effect",
+    selected = "AHAHA",
+    multi = false,
+    open = false,
+    max = 4,
+    values = {"AHAHA", "aha oh well"},
+    risky = false,
+    callback = function(value)
+        modifyHitSounds(function(sound)
+            sound.SoundId = hitSounds[value]
+        end)
+    end
+})
+
+-- Create volume slider
+Section2:AddSlider({
+    enabled = true,
+    text = "Hit Volume Beta!",
+    tooltip = "Adjust hit sound volume",
+    flag = "hit_volume_flag",
+    suffix = "",
+    dragging = true,
+    focused = false,
+    min = 0.1,
+    max = 5,
+    increment = 0.1,
+    value = 1,
+    risky = false,
+    callback = function(volume)
+        modifyHitSounds(function(sound)
+            sound.Volume = volume
+        end)
+    end
+})
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local localPlayer = Players.LocalPlayer
+
+-- Store original configurations for all guns
+local originalConfigs = {}
+local activeGuns = {}
+
+-- Function to modify gun configurations
+local function modifyGunConfig(gunName, fireRate, enabled)
+    local gunFolder = ReplicatedStorage.Players[localPlayer.Name].Inventory[gunName]
+    if not gunFolder then return end
+    
+    local settingsModule = gunFolder:FindFirstChild("SettingsModule")
+    if not settingsModule then return end
+
+    local config = require(settingsModule)
+    
+    if enabled then
+        -- Store original config if not already stored
+        if not originalConfigs[gunName] then
+            originalConfigs[gunName] = {
+                FireRate = config.FireRate,
+                FireMode = config.FireMode,
+                FireModes = table.clone(config.FireModes)
+            }
+        end
+        
+        -- Apply rapid fire settings
+        config.FireMode = "Auto"
+        config.FireModes = {"Auto"}
+        config.FireRate = fireRate
+        
+        -- Track modified guns
+        activeGuns[gunName] = true
+    else
+        -- Restore original settings
+        if originalConfigs[gunName] then
+            config.FireRate = originalConfigs[gunName].FireRate
+            config.FireMode = originalConfigs[gunName].FireMode
+            config.FireModes = table.clone(originalConfigs[gunName].FireModes)
+            activeGuns[gunName] = nil
+        end
+    end
+end
+
+-- Function to handle all guns in inventory
+local function updateAllGuns(fireRate, enabled)
+    local inventory = ReplicatedStorage.Players[localPlayer.Name].Inventory
+    for _, gunFolder in pairs(inventory:GetChildren()) do
+        if gunFolder:FindFirstChild("SettingsModule") then
+            modifyGunConfig(gunFolder.Name, fireRate, enabled)
+        end
+    end
+end
+
+-- UI Configuration
+Section1:AddToggle({
+    text = "Rapid Fire (All Guns)",
+    state = false,
+    risky = true,
+    tooltip = "Enable automatic rapid fire for all weapons",
+    flag = "Toggle_1",
+    callback = function(enabled)
+        if enabled then
+            updateAllGuns(1 / library.flags.Slider_1, true)
+        else
+            updateAllGuns(nil, false)
+        end
+    end
+})
+
+Section2:AddSlider({
+    text = "Fire Speed",
+    tooltip = "Shots per second (1-80 = realistic range)",
+    flag = "Slider_1",
+    suffix = "/s",
+    min = 1,
+    max = 80,
+    value = 10,
+    increment = 0.1,
+    callback = function(value)
+        if library.flags.Toggle_1 then
+            updateAllGuns(1 / value, true)
+        end
+    end
+})
+Section2:AddButton({
+    enabled = true,
+    text = "No Drowning",
+    tooltip = "Drowning",
+    confirm = true,
+    risky = false,
+    callback = function()
+local player = game.Players.LocalPlayer.Character.Health:Remove()
+print("Delete (Respawm Delete)")
+    end
+})
+-- Auto-update when new guns are added
+local inventory = ReplicatedStorage.Players[localPlayer.Name].Inventory
+inventory.ChildAdded:Connect(function(gunFolder)
+    if library.flags.Toggle_1 and gunFolder:FindFirstChild("SettingsModule") then
+        modifyGunConfig(gunFolder.Name, 1 / library.flags.Slider_1, true)
+    end
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Wait for player data to be available
+local ReplicatedPlayers = ReplicatedStorage:WaitForChild("Players")
+local PlayerFolder = ReplicatedPlayers:WaitForChild(localPlayer.Name)
+local Inventory = PlayerFolder:WaitForChild("Inventory")
+
+-- Store original offsets for all guns
+local originalOffsets = {}
+local currentPosition = Vector3.new(0, -1.6, 0.3)  -- Default position
+
+-- Function to apply offset to a specific weapon
+local function applyWeaponOffset(weapon)
+    if weapon:FindFirstChild("SettingsModule") then
+        local SettingsModule = require(weapon.SettingsModule)
+        
+        -- Store original offset if not already stored
+        if not originalOffsets[weapon] then
+            originalOffsets[weapon] = SettingsModule.weaponOffSet
+        end
+        
+        -- Apply current offset if toggle is enabled
+        if library.flags.Offset_Toggle then
+            SettingsModule.weaponOffSet = CFrame.new(currentPosition)
+        else
+            SettingsModule.weaponOffSet = originalOffsets[weapon]
+        end
+    end
+end
+
+-- Function to apply offset to all weapons
+local function applyToAllWeapons()
+    for _, weapon in pairs(Inventory:GetChildren()) do
+        applyWeaponOffset(weapon)
+    end
+end
+
+-- Toggle for offset modification
+Section1:AddToggle({
+    text = "Offset",
+    state = false,
+    flag = "Offset_Toggle",
+    callback = function(enabled)
+        applyToAllWeapons()
+    end
+})
+
+-- Function to update offset and apply to all weapons
+local function updateOffset()
+    if library.flags.Offset_Toggle then
+        applyToAllWeapons()
+    end
+end
+
+-- X Axis Slider
+Section1:AddSlider({
+    text = "X Axis Offset",
+    flag = "X_Offset",
+    min = -5,
+    max = 5,
+    value = currentPosition.X,
+    increment = 0.01,
+    callback = function(x)
+        currentPosition = Vector3.new(x, currentPosition.Y, currentPosition.Z)
+        updateOffset()
+    end
+})
+
+-- Y Axis Slider
+Section1:AddSlider({
+    text = "Y Axis Offset",
+    flag = "Y_Offset",
+    min = -5,
+    max = 5,
+    value = currentPosition.Y,
+    increment = 0.01,
+    callback = function(y)
+        currentPosition = Vector3.new(currentPosition.X, y, currentPosition.Z)
+        updateOffset()
+    end
+})
+
+-- Z Axis Slider
+Section1:AddSlider({
+    text = "Z Axis Offset",
+    flag = "Z_Offset",
+    min = -5,
+    max = 5,
+    value = currentPosition.Z,
+    increment = 0.01,
+    callback = function(z)
+        currentPosition = Vector3.new(currentPosition.X, currentPosition.Y, z)
+        updateOffset()
+    end
+})
+
+-- Set up auto-update for new weapons
+Inventory.ChildAdded:Connect(function(newWeapon)
+    applyWeaponOffset(newWeapon)
+end)
+
+-- Apply to existing weapons
+applyToAllWeapons()
+
+Section2:AddButton({
+    enabled = true,
+    text = "OFF Ambient",
+    tooltip = "Ambient",
+    confirm = true,
+    risky = false,
+    callback = function()
+workspace.AmbientSounds.Ambient1.Volume = 0 
+workspace.AmbientSounds.Ambient2.Volume = 0 
+workspace.AmbientSounds.AmbientXmas.Volume = 0
+workspace.Radio.MeshPart.Music.Sound.SoundId = "rbxassetid://89591435314348"
+wait(1)
+workspace.Radio.MeshPart.Music.Sound.PlaybackSpeed = 1.29
+workspace.Radio.MeshPart.Music.Sound.Volume = 5
+    end
+})
+Section2:AddButton({
+    enabled = true,
+    text = "Remove (Animate ONLY RAGE)",
+    tooltip = "+lay add",
+    confirm = true,
+    risky = true,
+    callback = function()
+local player = game.Players.LocalPlayer.Character.Animate:Remove()
+wait(0.01)
+local player = game.Players.LocalPlayer.Character.AnimateRotation:Remove()
+    end
+})
+Section2:AddButton({
+    enabled = true,
+    text = "Recoil",
+    tooltip = "Recoil",
+    confirm = true,
+    risky = false,
+    callback = function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/Mixvpnv2/nore/refs/heads/main/notred'))()
+    end
+})
+Section1:AddButton({
+    enabled = true,
+    text = "Unlock FireMode",
+    tooltip = "Unlock",
+    confirm = true,
+    risky = false,
+    callback = function()
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RunService = game:GetService("RunService")
+        
+        local player = Players.LocalPlayer
+        local targetValue = 10  -- Auto mode
+        
+        -- Main function to set FireModeIndex for all weapons
+        local function setFireModeIndex()
+            -- Get player folder
+            local playerFolder = ReplicatedStorage.Players:FindFirstChild(player.Name)
+            if not playerFolder then return false end
+            
+            -- Get inventory
+            local inventory = playerFolder:FindFirstChild("Inventory")
+            if not inventory then return false end
+            
+            -- Process all weapons
+            for _, weapon in ipairs(inventory:GetChildren()) do
+                -- Find ItemProperties
+                local itemProps = weapon:FindFirstChild("ItemProperties")
+                if itemProps then
+                    -- Find FireModeIndex specifically
+                    local fireModeIndex = itemProps:FindFirstChild("FireModeIndex")
+                    
+                    if fireModeIndex then
+                        -- Apply using multiple techniques simultaneously
+                        
+                        -- Technique 1: Direct value set
+                        pcall(function()
+                            fireModeIndex.Value = targetValue
+                        end)
+                        
+                        -- Technique 2: Attribute set
+                        pcall(function()
+                            itemProps:SetAttribute("FireModeIndex", targetValue)
+                        end)
+                        
+                        -- Technique 3: Value replacement
+                        pcall(function()
+                            local clone = fireModeIndex:Clone()
+                            clone.Value = targetValue
+                            clone.Name = "FireModeIndex"
+                            fireModeIndex:Destroy()
+                            clone.Parent = itemProps
+                        end)
+                    else
+                        -- Create FireModeIndex if it doesn't exist
+                        pcall(function()
+                            local newIndex = Instance.new("IntValue")
+                            newIndex.Name = "FireModeIndex"
+                            newIndex.Value = targetValue
+                            newIndex.Parent = itemProps
+                        end)
+                    end
+                end
+            end
+            
+            return true
+        end
+        
+        -- Advanced monitoring system
+        local function weaponMaintenance()
+            local successCount = 0
+            local lastPrint = 0
+            
+            while task.wait(0.1) do  -- Check 10 times per second
+                -- Try to apply settings
+                local success = pcall(setFireModeIndex)
+                
+                if success then
+                    successCount += 1
+                    
+                    -- Print status every 2 seconds
+                    if os.time() - lastPrint > 2 then
+                        print("🔥 Maintaining FireModeIndex at", targetValue)
+                        lastPrint = os.time()
+                    end
+                end
+                
+                -- Additional: Force global FireModeIndex setting
+                pcall(function()
+                    ReplicatedStorage:SetAttribute("GlobalFireModeIndex", targetValue)
+                    
+                    if ReplicatedStorage:FindFirstChild("GameSettings") then
+                        ReplicatedStorage.GameSettings:SetAttribute("FireModeIndexOverride", targetValue)
+                    end
+                end)
+            end
+        end
+        
+        -- Initialize
+        local function init()
+            print("🎯 Starting FireModeIndex unlock system")
+            print("Exclusively targeting FireModeIndex property")
+            
+            -- First execution
+            setFireModeIndex()
+            
+            -- Start maintenance
+            coroutine.wrap(weaponMaintenance)()
+        end
+        
+        -- Player connection
+        if player:IsDescendantOf(game) then
+            init()
+        else
+            player:GetPropertyChangedSignal("Parent"):Wait()
+            init()
+        end
+        
+        -- Create debug display
+        local function createDebugUI()
+            local ScreenGui = Instance.new("ScreenGui")
+            ScreenGui.Name = "FireModeDebug"
+            ScreenGui.Parent = player.PlayerGui
+            
+            local Frame = Instance.new("Frame")
+            Frame.Size = UDim2.new(0, 200, 0, 100)
+            Frame.Position = UDim2.new(0, 10, 0, 10)
+            Frame.BackgroundTransparency = 0.7
+            Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+            Frame.Parent = ScreenGui
+            
+            local Title = Instance.new("TextLabel")
+            Title.Text = "FireModeIndex Status"
+            Title.Size = UDim2.new(1, 0, 0, 20)
+            Title.BackgroundTransparency = 1
+            Title.TextColor3 = Color3.new(1, 1, 1)
+            Title.Parent = Frame
+            
+            local WeaponList = Instance.new("TextLabel")
+            WeaponList.Name = "WeaponList"
+            WeaponList.Size = UDim2.new(1, 0, 1, -20)
+            WeaponList.Position = UDim2.new(0, 0, 0, 20)
+            WeaponList.BackgroundTransparency = 1
+            WeaponList.TextColor3 = Color3.new(1, 1, 1)
+            WeaponList.TextXAlignment = Enum.TextXAlignment.Left
+            WeaponList.TextYAlignment = Enum.TextYAlignment.Top
+            WeaponList.Text = "Loading weapons..."
+            WeaponList.Parent = Frame
+            
+            -- Update weapon status
+            coroutine.wrap(function()
+                while task.wait(0.5) do
+                    if not ScreenGui.Parent then break end
+                    
+                    local playerFolder = ReplicatedStorage.Players:FindFirstChild(player.Name)
+                    if not playerFolder then continue end
+                    
+                    local inventory = playerFolder:FindFirstChild("Inventory")
+                    if not inventory then continue end
+                    
+                    local statusText = ""
+                    for _, weapon in ipairs(inventory:GetChildren()) do
+                        local itemProps = weapon:FindFirstChild("ItemProperties")
+                        if itemProps then
+                            local fireModeIndex = itemProps:FindFirstChild("FireModeIndex")
+                            if fireModeIndex then
+                                statusText ..= weapon.Name .. ": " .. tostring(fireModeIndex.Value) .. "\n"
+                            else
+                                statusText ..= weapon.Name .. ": ❌ Missing\n"
+                            end
+                        else
+                            statusText ..= weapon.Name .. ": ❌ No ItemProps\n"
+                        end
+                    end
+                    
+                    WeaponList.Text = statusText
+                end
+            end)()
+        end
+        
+        -- Create debug UI
+        if player:FindFirstChild("PlayerGui") then
+            createDebugUI()
+        else
+            player:WaitForChild("PlayerGui")
+            createDebugUI()
+        end
+    end
+})
+Section2:AddButton({
+    enabled = true,
+    text = "Anchored Torso (Press J)",
+    tooltip = "Anchored",
+    confirm = true,
+    risky = false,
+    callback = function()
+        local Player = game.Players.LocalPlayer
+        local UIS = game:GetService("UserInputService")
+        
+        UIS.InputBegan:Connect(function(input)
+            if input.KeyCode == Enum.KeyCode.J then
+                pcall(function()
+                    Player.Character.UpperTorso.Anchored = not Player.Character.UpperTorso.Anchored
+                end)
+            end
+        end)
+    end
+})
+Section1:AddButton({
+    enabled = true,
+    text = "Unlock Boss (ONLY SELL)",
+    tooltip = "Unlock",
+    confirm = true,
+    risky = false,
+    callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ReplicatedPlayer = ReplicatedStorage.Players:FindFirstChild(Players.LocalPlayer.Name)
+
+if ReplicatedPlayer then
+    local Boss = ReplicatedPlayer.Status.Journey.Quests:FindFirstChild("BossFirst")
+
+    if not Boss then
+        local NewBoss = Instance.new("Folder")
+        NewBoss.Parent = ReplicatedPlayer.Status.Journey
+        NewBoss.Name = "BossFirst"
+        NewBoss:SetAttribute("State", "Complete")
+
+        local NewFetch1 = NewBoss:Clone()
+        NewFetch1.Name = "Fetch1"
+        NewFetch1.Parent = NewBoss
+        NewFetch1:SetAttribute("State", nil)
+        NewFetch1:SetAttribute("Carrying", false)
+        NewFetch1:SetAttribute("Complete", false)
+        NewFetch1:SetAttribute("Survive", true)
+        NewFetch1:SetAttribute("Type", "Fetch")
+
+        NewBoss.Parent = ReplicatedPlayer.Status.Journey.Quests
+    else
+        Boss:SetAttribute("State", "Complete")
+    end
+end
+    end
+})
+local Time = (string.format("%."..tostring(Decimals).."f", os.clock() - Clock))
+library:SendNotification(("Loaded In "..tostring(Time)), 6)
+wait(0.01)
+local SoundService = game:GetService("SoundService")
+
+-- Example: Set the ambient volume
+SoundService.AmbientReverb = Enum.ReverbType.Cave
+
+-- Example: Play a sound globally
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://15226038122" -- Replace with a valid sound asset ID
+sound.Volume = 8
+sound.Looped = false
+sound.Parent = SoundService
+sound:Play()
